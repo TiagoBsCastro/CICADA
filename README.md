@@ -8,8 +8,6 @@
 
 CICADA is planned as a lightweight Python library for cosmological map-making and large-scale-structure statistics. The motivation is to provide a simpler, easier-to-install alternative to performance-focused libraries such as Pylians, while keeping the code readable, testable, and based on standard scientific Python tools.
 
-> Status: planning scaffold only. No scientific routines are implemented yet.
-
 ## Motivation
 
 Many cosmological analysis workflows need simple operations such as assigning particles to grids, creating projected density maps, and computing two-point statistics. Existing tools are often highly optimized, but may depend on compiled extensions or dependency stacks that are difficult to maintain across systems.
@@ -79,7 +77,3 @@ The first rule of CICADA is:
 > Prefer transparent, correct, well-tested code before optimization.
 
 This project should remain easy to inspect, easy to install, and easy to teach from.
-
-## Name
-
-CICADA is meant to evoke both the **CIC** mass-assignment scheme and the insect used in the visual identity. The logo combines a cicada, cosmological arcs, astrophysical objects, and statistical motifs.
