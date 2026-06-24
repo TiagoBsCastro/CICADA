@@ -446,3 +446,72 @@ def density_map_2d(
             grid_map.fill(0.0)
             
     return grid_map
+
+def density_grid_3d_interlaced(
+    pos,
+    boxsize,
+    grid,
+    weights=None,
+    scheme="CIC",
+    periodic=True,
+    overdensity=False,
+    dtype=np.float32,
+):
+    """
+    Construct a pair of 3D density grids for interlaced power spectrum estimation.
+
+    The first grid is built from the original particle positions.  The second
+    grid is built from positions shifted by +0.5 cells in every dimension.
+    This shift convention matches the phase correction used by
+    ``power_spectrum_3d(..., interlacing=True)``.
+
+    Parameters
+    ----------
+    pos : array_like, shape (N, 3)
+        Particle positions.
+    boxsize : float or array_like of shape (3,)
+        Size of the simulation box.
+    grid : int or array_like of shape (3,)
+        Number of grid cells per dimension.
+    weights : array_like, shape (N,), optional
+        Weights to assign to each particle.
+    scheme : str, optional
+        Mass assignment scheme ('NGP', 'CIC', 'TSC', or 'PCS'). Default is 'CIC'.
+    periodic : bool, optional
+        Whether to use periodic boundary conditions. Default is True.
+    overdensity : bool, optional
+        If True, return overdensity delta = rho / mean(rho) - 1.
+    dtype : data-type, optional
+        Data type of the output grids.
+
+    Returns
+    -------
+    delta : ndarray, shape (grid, grid, grid)
+        Density grid from the original positions.
+    delta_shifted : ndarray, shape (grid, grid, grid)
+        Density grid from positions shifted by half a cell in each dimension.
+    """
+    pos = np.asarray(pos)
+    boxsize_arr = _get_boxsize(boxsize, 3)
+    grid_arr = _get_grid(grid, 3)
+
+    cell_size = boxsize_arr / grid_arr
+    shift = 0.5 * cell_size
+
+    delta = density_grid_3d(
+        pos, boxsize, grid,
+        weights=weights, scheme=scheme, periodic=periodic,
+        overdensity=overdensity, dtype=dtype,
+    )
+
+    pos_shifted = pos[:, :3] + shift
+    if periodic:
+        pos_shifted = np.mod(pos_shifted, boxsize_arr)
+
+    delta_shifted = density_grid_3d(
+        pos_shifted, boxsize, grid,
+        weights=weights, scheme=scheme, periodic=periodic,
+        overdensity=overdensity, dtype=dtype,
+    )
+
+    return delta, delta_shifted
